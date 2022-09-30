@@ -1,0 +1,27 @@
+# See the syntax docs at
+# https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions
+
+name: Licenses export
+description: Generates a file with the dependencies used in the application with their respective licenses.
+
+inputs:
+  licenses-file:
+    description: 'Licenses output JSON file'
+    required: false
+    default: 'licenses.json'
+  omit-version:
+    description: 'Omit package versions from the report'
+    required: false
+    default: 'true'
+  production-only:
+    description: 'Only include production packages'
+    required: false
+    default: 'true'
+  direct-dependencies-only:
+    description: 'Only include direct dependencies'
+    required: false
+    default: 'true'
+
+runs:
+  using: 'node16'
+  main: 'dist/index.js'

@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "lint": "eslint .",
-    "test": "echo \"Error: no test specified\" && exit 0",
+    "lint:fix": "eslint . --fix",
+    "test": "echo \"No test specified\" && exit 1",
     "prepare": "husky install",
     "build": "ncc build src --license licenses.txt"
   },
@@ -36,6 +37,7 @@
     "*.{js,jsx}": "eslint --cache --fix"
   },
   "dependencies": {
-    "@actions/core": "^1.10.0"
+    "@actions/core": "^1.10.0",
+    "npm-license-crawler": "^0.2.1"
   }
 }
