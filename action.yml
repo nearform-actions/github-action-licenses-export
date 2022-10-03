@@ -5,27 +5,16 @@ name: Licenses export
 description: Generates a file with the dependencies used in the application with their respective licenses.
 
 inputs:
-  find-path:
-    description: 'Path to the directory where the search for package.json files starts at'
+  path:
+    description: 'Path to the directory where the package.json file and the node_modules folder are'
     required: false
     default: './'
-  exclude-path:
-    description: 'Path to a directory to be excluded from the package.json search'
-    required: false
   licenses-file:
     description: 'Licenses output JSON file'
     required: false
     default: 'licenses.json'
-  omit-version:
-    description: 'Omit package versions from the report'
-    required: false
-    default: 'true'
-  production-only:
-    description: 'Only include production packages'
-    required: false
-    default: 'true'
-  direct-dependencies-only:
-    description: 'Only include direct dependencies'
+  include-dev:
+    description: 'Include development packages'
     required: false
     default: 'true'
 

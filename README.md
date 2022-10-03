@@ -6,29 +6,17 @@ GitHub action that generates a file with the dependencies used in the applicatio
 
 ## Inputs
 
-### `find-path`
+### `path`
 
-**Optional** Path to the directory where the search for package.json files starts at. Default `'./'`.
-
-### `exclude-path`
-
-**Optional** Path to a directory to be excluded from the package.json search. Default `undefined`.
+**Optional** Path to the directory where the package.json file and the node_modules folder are. Default `'./'`.
 
 ### `licenses-file`
 
 **Optional** Licenses output JSON file. Default `'licenses.json'`.
 
-### `omit-version`
+### `include-dev`
 
-**Optional** Omit package versions from the report. Default `'true'`.
-
-### `production-only`
-
-**Optional** Only include production packages. Default `'true'`.
-
-### `direct-dependencies-only`
-
-**Optional** Only include direct dependencies. Default `'true'`.
+**Optional** Include development packages. Default `'false'`.
 
 ## Basic example
 
