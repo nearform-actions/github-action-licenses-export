@@ -16,7 +16,7 @@ inputs:
   include-dev:
     description: 'Include development packages'
     required: false
-    default: 'true'
+    default: 'false'
 
 runs:
   using: 'node16'
