@@ -6,6 +6,14 @@ GitHub action that generates a file with the dependencies used in the applicatio
 
 ## Inputs
 
+### `find-path`
+
+**Optional** Path to the directory where the search for package.json files starts at. Default `'./'`.
+
+### `exclude-path`
+
+**Optional** Path to a directory to be excluded from the package.json search. Default `undefined`.
+
 ### `licenses-file`
 
 **Optional** Licenses output JSON file. Default `'licenses.json'`.

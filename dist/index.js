@@ -21181,9 +21181,10 @@ var external_fs_ = __nccwpck_require__(7147);
 const external_node_util_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:util");
 // EXTERNAL MODULE: ./node_modules/npm-license-crawler/lib/index.js
 var lib = __nccwpck_require__(8989);
-;// CONCATENATED MODULE: ./src/contants.js
+;// CONCATENATED MODULE: ./src/constants.js
 const DEFAULT_OPTIONS = {
-  path: ['./'],
+  findPath: './',
+  excludePath: undefined,
   omitVersion: true,
   productionOnly: true,
   directDependenciesOnly: true
@@ -21201,7 +21202,8 @@ function getLicenses(settings) {
   const options = { ...DEFAULT_OPTIONS, ...settings }
 
   return dumpLicenses({
-    start: options.path,
+    start: [options.findPath],
+    exclude: options.excludePath ? [options.excludePath] : [],
     omitVersion: options.omitVersion,
     production: options.productionOnly,
     onlyDirectDependencies: options.directDependenciesOnly,
@@ -21216,6 +21218,8 @@ function getLicenses(settings) {
 
 
 async function run() {
+  const findPath = core.getInput('find-path')
+  const excludePath = core.getInput('exclude-path')
   const licensesFile = core.getInput('licenses-file')
   const omitVersion = core.getBooleanInput('omit-version')
   const productionOnly = core.getBooleanInput('production-only')
@@ -21224,6 +21228,8 @@ async function run() {
   )
 
   const licenses = await getLicenses({
+    findPath,
+    excludePath,
     licensesFile,
     omitVersion,
     productionOnly,

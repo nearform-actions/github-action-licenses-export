@@ -5,6 +5,13 @@ name: Licenses export
 description: Generates a file with the dependencies used in the application with their respective licenses.
 
 inputs:
+  find-path:
+    description: 'Path to the directory where the search for package.json files starts at'
+    required: false
+    default: './'
+  exclude-path:
+    description: 'Path to a directory to be excluded from the package.json search'
+    required: false
   licenses-file:
     description: 'Licenses output JSON file'
     required: false
