@@ -36,6 +36,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+      - name: Install dependencies
+        run: |
+          npm ci
       - name: Generate licenses file
         uses: nearform/github-action-licenses-export@v1
         with:
