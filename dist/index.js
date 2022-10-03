@@ -2873,7 +2873,11 @@ async function run() {
     includeDev
   })
 
-  external_fs_.writeFileSync(licensesFile, JSON.stringify(licenses, null, 2))
+  if (licensesFile) {
+    external_fs_.writeFileSync(licensesFile, JSON.stringify(licenses, null, 2))
+  }
+
+  core.setOutput('licenses', licenses)
 }
 
 ;// CONCATENATED MODULE: ./src/index.js

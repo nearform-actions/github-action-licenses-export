@@ -12,11 +12,14 @@ inputs:
   licenses-file:
     description: 'Licenses output JSON file'
     required: false
-    default: 'licenses.json'
   include-dev:
     description: 'Include development packages'
     required: false
     default: 'false'
+
+outputs:
+  licenses:
+    description: JSON representation of the licenses list
 
 runs:
   using: 'node16'

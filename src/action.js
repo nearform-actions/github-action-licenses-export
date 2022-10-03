@@ -13,5 +13,9 @@ export async function run() {
     includeDev
   })
 
-  fs.writeFileSync(licensesFile, JSON.stringify(licenses, null, 2))
+  if (licensesFile) {
+    fs.writeFileSync(licensesFile, JSON.stringify(licenses, null, 2))
+  }
+
+  core.setOutput('licenses', licenses)
 }

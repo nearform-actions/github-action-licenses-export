@@ -2,7 +2,7 @@
 
 # github-action-licenses-export
 
-GitHub action that generates a file with the dependencies used in the application with their respective licenses. The file can be used to properly redistribute the licenses by displaying them in your application.
+GitHub action that generates a list with the dependencies used in the application with their respective licenses. The result can be exported to a file or passed in as an argument to another GitHub action so it can be used to properly redistribute the licenses by displaying them in your application.
 
 ## Inputs
 
@@ -12,11 +12,17 @@ GitHub action that generates a file with the dependencies used in the applicatio
 
 ### `licenses-file`
 
-**Optional** Licenses output JSON file. Default `'licenses.json'`.
+**Optional** Licenses output JSON file.
 
 ### `include-dev`
 
 **Optional** Include development packages. Default `'false'`.
+
+## Outputs
+
+### `licenses`
+
+JSON representation of the licenses list.
 
 ## Basic example
 
