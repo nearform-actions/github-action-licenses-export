@@ -8,7 +8,7 @@ GitHub action that generates a list with the dependencies used in the applicatio
 
 ### `path`
 
-**Optional** Path to the directory where the package.json file and the node_modules folder are. Default `'./'`.
+**Optional** Path to the directory where the package.json file and the node_modules folder are, it supports multiple directories by passing in a comma-separated list. Default `'./'`.
 
 ### `licenses-file`
 

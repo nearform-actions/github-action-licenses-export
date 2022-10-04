@@ -1,5 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import semver from 'semver'
 
 function parsePackageInfo(packagePath) {
   const packagecontents = JSON.parse(
@@ -9,9 +10,13 @@ function parsePackageInfo(packagePath) {
 }
 
 function getDependencies(packageInfo, options) {
-  const dependencies = Object.keys(packageInfo.dependencies)
+  const dependencies = []
 
-  if (options.includeDev) {
+  if (packageInfo.dependencies) {
+    dependencies.push(...Object.keys(packageInfo.dependencies))
+  }
+
+  if (options.includeDev && packageInfo.devDependencies) {
     dependencies.push(...Object.keys(packageInfo.devDependencies))
   }
 
@@ -62,11 +67,36 @@ function getDependenciesLicenseInfo(packagePath, dependencies) {
   })
 }
 
+function buildUniqueLicenses(licenses) {
+  return licenses.reduce((licenses, license) => {
+    const existing = licenses[license.name]
+    if (!existing) {
+      licenses[license.name] = license
+    } else if (semver.gt(license.version, existing.version)) {
+      existing.version = license.version
+    }
+    return licenses
+  }, {})
+}
+
 export default function getLicenses(options) {
-  const path = options.path || './'
-  const packageInfo = parsePackageInfo(path)
-  const dependencies = getDependencies(packageInfo, {
-    includeDev: options.includeDev || false
-  })
-  return getDependenciesLicenseInfo(path, dependencies)
+  const defaultSettings = {
+    path: ['./'],
+    includeDev: false
+  }
+
+  const settings = { ...defaultSettings, ...options }
+  const { path, includeDev } = settings
+
+  const licenses = []
+
+  for (const subPath of path) {
+    const packageInfo = parsePackageInfo(subPath)
+    const dependencies = getDependencies(packageInfo, {
+      includeDev
+    })
+    licenses.push(...getDependenciesLicenseInfo(subPath, dependencies))
+  }
+
+  return buildUniqueLicenses(licenses)
 }
