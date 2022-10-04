@@ -1,3 +1,4 @@
+import glob from 'glob'
 import fs from 'node:fs'
 import path from 'node:path'
 import semver from 'semver'
@@ -38,15 +39,15 @@ function getPackageAuthor(packageInfo) {
 }
 
 function getLicenseText(packagePath) {
-  const files = ['LICENSE.md', 'LICENSE', 'LICENSE.txt']
+  const files = glob.sync(path.join(packagePath, 'licen[sc]e*'), {
+    nocase: true,
+    nodir: true
+  })
 
-  for (const file of files) {
-    const filePath = path.join(packagePath, file)
-    if (fs.existsSync(filePath)) {
-      return fs.readFileSync(filePath, {
-        encoding: 'utf-8'
-      })
-    }
+  if (files.length) {
+    return fs.readFileSync(files[0], {
+      encoding: 'utf-8'
+    })
   }
 
   return undefined
