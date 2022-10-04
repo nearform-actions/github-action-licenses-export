@@ -2787,11 +2787,16 @@ var core = __nccwpck_require__(186);
 var external_fs_ = __nccwpck_require__(147);
 ;// CONCATENATED MODULE: external "node:fs"
 const external_node_fs_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:fs");
+;// CONCATENATED MODULE: external "node:path"
+const external_node_path_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:path");
 ;// CONCATENATED MODULE: ./src/licenses.js
 
 
-function parsePackageInfo(path) {
-  const packagecontents = JSON.parse(external_node_fs_namespaceObject.readFileSync(`${path}/package.json`))
+
+function parsePackageInfo(packagePath) {
+  const packagecontents = JSON.parse(
+    external_node_fs_namespaceObject.readFileSync(external_node_path_namespaceObject.join(packagePath, 'package.json'))
+  )
   return packagecontents
 }
 
@@ -2819,12 +2824,13 @@ function getPackageAuthor(packageInfo) {
   return undefined
 }
 
-function getLicenseText(path) {
+function getLicenseText(packagePath) {
   const files = ['LICENSE.md', 'LICENSE', 'LICENSE.txt']
 
   for (const file of files) {
-    if (external_node_fs_namespaceObject.existsSync(`${path}/${file}`)) {
-      return external_node_fs_namespaceObject.readFileSync(`${path}/${file}`, {
+    const filePath = external_node_path_namespaceObject.join(packagePath, file)
+    if (external_node_fs_namespaceObject.existsSync(filePath)) {
+      return external_node_fs_namespaceObject.readFileSync(filePath, {
         encoding: 'utf-8'
       })
     }
@@ -2833,9 +2839,9 @@ function getLicenseText(path) {
   return undefined
 }
 
-function getDependenciesLicenseInfo(path, dependencies) {
+function getDependenciesLicenseInfo(packagePath, dependencies) {
   return dependencies.map(dependency => {
-    const dependencyPath = `${path}/node_modules/${dependency}`
+    const dependencyPath = external_node_path_namespaceObject.join(packagePath, 'node_modules', dependency)
     const packageInfo = parsePackageInfo(dependencyPath)
 
     return {

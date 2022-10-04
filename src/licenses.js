@@ -1,7 +1,10 @@
 import fs from 'node:fs'
+import path from 'node:path'
 
-function parsePackageInfo(path) {
-  const packagecontents = JSON.parse(fs.readFileSync(`${path}/package.json`))
+function parsePackageInfo(packagePath) {
+  const packagecontents = JSON.parse(
+    fs.readFileSync(path.join(packagePath, 'package.json'))
+  )
   return packagecontents
 }
 
@@ -29,12 +32,13 @@ function getPackageAuthor(packageInfo) {
   return undefined
 }
 
-function getLicenseText(path) {
+function getLicenseText(packagePath) {
   const files = ['LICENSE.md', 'LICENSE', 'LICENSE.txt']
 
   for (const file of files) {
-    if (fs.existsSync(`${path}/${file}`)) {
-      return fs.readFileSync(`${path}/${file}`, {
+    const filePath = path.join(packagePath, file)
+    if (fs.existsSync(filePath)) {
+      return fs.readFileSync(filePath, {
         encoding: 'utf-8'
       })
     }
@@ -43,9 +47,9 @@ function getLicenseText(path) {
   return undefined
 }
 
-function getDependenciesLicenseInfo(path, dependencies) {
+function getDependenciesLicenseInfo(packagePath, dependencies) {
   return dependencies.map(dependency => {
-    const dependencyPath = `${path}/node_modules/${dependency}`
+    const dependencyPath = path.join(packagePath, 'node_modules', dependency)
     const packageInfo = parsePackageInfo(dependencyPath)
 
     return {
