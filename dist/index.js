@@ -9288,17 +9288,11 @@ function getDependencies(packageInfo, options) {
 }
 
 function getPackageAuthor(packageInfo) {
-  if (packageInfo.author) {
-    if (typeof packageInfo.author === 'string') {
-      return packageInfo.author
-    }
-
-    if (packageInfo.author.name) {
-      return packageInfo.author.name
-    }
+  if (typeof packageInfo.author === 'string') {
+    return packageInfo.author
   }
 
-  return undefined
+  return packageInfo.author?.name
 }
 
 function getLicenseText(packagePath) {
