@@ -9366,9 +9366,7 @@ function getLicenses(options) {
 
 
 async function run() {
-  const path = core.getInput('path')
-    .split(',')
-    .map(path => path.trim())
+  const path = core.getMultilineInput('path')
   const includeDev = core.getBooleanInput('include-dev')
   const licensesFile = core.getInput('licenses-file')
 

@@ -6,7 +6,7 @@ description: Generates a file with the dependencies used in the application with
 
 inputs:
   path:
-    description: 'Path to the directory where the package.json file and the node_modules folder are, it supports multiple directories by passing in a comma-separated list'
+    description: 'Path to the directory where the package.json file and the node_modules folder are, it supports multiple directories by passing them into new lines'
     required: false
     default: './'
   licenses-file:
