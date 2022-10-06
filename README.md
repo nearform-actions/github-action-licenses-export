@@ -6,27 +6,18 @@ GitHub action that generates a list with the dependencies used in a Node.js appl
 
 ## Inputs
 
-### `path`
-
-**Optional** Path to the directory where the package.json file and the node_modules folder are, it supports multiple directories by passing them into new lines. Default `'./'`.
-
-### `licenses-file`
-
-**Optional** Licenses output JSON file.
-
-### `include-dev`
-
-**Optional** Include development packages. Default `'false'`.
-
-### `include-transitive`
-
-**Optional** Include transitive packages. Default `'true'`.
+| Name                 | Required | Default   | Description                                                                                                                                            |
+| -------------------- | -------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `path`               | No       | `'./'`    | Path to the directory where the `package.json` file and the `node_modules` folder are, it supports multiple directories by passing them into new lines |
+| `licenses-file`      | No       |           | Licenses output JSON file                                                                                                                              |
+| `include-dev`        | No       | `'false'` | Include development packages                                                                                                                           |
+| `include-transitive` | No       | `'true'`  | Include transitive packages                                                                                                                            |
 
 ## Outputs
 
-### `licenses`
-
-JSON representation of the licenses list.
+| Name       | Description                              |
+| ---------- | ---------------------------------------- |
+| `licenses` | JSON representation of the licenses list |
 
 ## Examples
 
