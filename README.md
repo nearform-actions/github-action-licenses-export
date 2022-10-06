@@ -2,7 +2,7 @@
 
 # github-action-licenses-export
 
-GitHub action that generates a list with the dependencies used in a Node.js application with their respective licenses. The result can be exported to a file or passed in as an argument to another GitHub action so it can be used to properly redistribute the licenses by displaying them in your application.
+GitHub action that generates a list with the dependencies used in a **Node.js application** with their respective licenses. The result can be exported to a file or passed in as an argument to another GitHub action so it can be used to properly redistribute the licenses by displaying them in your application.
 
 ## Inputs
 
