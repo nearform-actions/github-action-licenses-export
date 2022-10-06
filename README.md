@@ -19,6 +19,10 @@ GitHub action that generates a list with the dependencies used in a Node.js appl
 | ---------- | ---------------------------------------- |
 | `licenses` | JSON representation of the licenses list |
 
+## How it works
+
+This action reads the `package.json` from the provided path to determine the dependencies of the package, with the list of dependencies it then tries to find the information about these dependencies in their respective `package.json` and `LICENSE` files that are available within the `node_modules` folder.
+
 ## Examples
 
 ### Generating a license file and commiting the changes
