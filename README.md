@@ -28,16 +28,19 @@ GitHub action that generates a list with the dependencies used in a Node.js appl
 
 JSON representation of the licenses list.
 
-## Basic example
+## Examples
+
+### Generating a license file and commiting the changes
+
+This example runs on every push to the `master` branch and generates a license file located in `src/licenses.json` that gets commited and pushed if there are changes.
 
 ```yaml
-name: Update licenses
+name: Update licenses file
 
 on:
   push:
    branches:
     - master
-  pull_request:
 
 jobs:
   update-licenses:
@@ -62,4 +65,38 @@ jobs:
         with:
           message: 'chore: update licenses file'
           add: src/licenses.json
+```
+
+### Using the output in another step
+
+This example uses the action output in another step of the job.
+
+```yaml
+name: Display licenses
+
+on:
+  push:
+   branches:
+    - master
+
+jobs:
+  update-licenses:
+    name: Generates a licenses list for the dependencies used in the application and commits the changes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+      - name: Install dependencies
+        run: |
+          npm ci
+      - name: Generate licenses
+        id: generate_licenses
+        uses: nearform/github-action-licenses-export@v1
+      - name: Do something with the licenses
+        run: |
+          echo ${{ steps.generate_licenses.outputs.licenses }}
 ```
