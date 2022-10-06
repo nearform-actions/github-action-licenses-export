@@ -16,6 +16,10 @@ inputs:
     description: 'Include development packages'
     required: false
     default: 'false'
+  include-transitive:
+    description: 'Include transitive packages'
+    required: false
+    default: 'true'
 
 outputs:
   licenses:

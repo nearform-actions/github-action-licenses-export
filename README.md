@@ -18,6 +18,10 @@ GitHub action that generates a list with the dependencies used in a Node.js appl
 
 **Optional** Include development packages. Default `'false'`.
 
+### `include-transitive`
+
+**Optional** Include transitive packages. Default `'true'`.
+
 ## Outputs
 
 ### `licenses`
