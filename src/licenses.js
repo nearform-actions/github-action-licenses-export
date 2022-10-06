@@ -3,26 +3,8 @@ import fs from 'node:fs'
 import path from 'node:path'
 import semver from 'semver'
 
-function parsePackageInfo(packagePath) {
-  const packagecontents = JSON.parse(
-    fs.readFileSync(path.join(packagePath, 'package.json'))
-  )
-  return packagecontents
-}
-
-function getDependencies(packageInfo, options) {
-  const dependencies = []
-
-  if (packageInfo.dependencies) {
-    dependencies.push(...Object.keys(packageInfo.dependencies))
-  }
-
-  if (options.includeDev && packageInfo.devDependencies) {
-    dependencies.push(...Object.keys(packageInfo.devDependencies))
-  }
-
-  return dependencies
-}
+import DependencyCrawler from './dependency-crawler.js'
+import { parsePackageInfo } from './util.js'
 
 function getPackageAuthor(packageInfo) {
   if (typeof packageInfo.author === 'string') {
@@ -77,19 +59,25 @@ function buildUniqueLicenses(licenses) {
 export default function getLicenses(options) {
   const defaultSettings = {
     path: ['./'],
-    includeDev: false
+    includeDev: false,
+    includeTransitive: true
   }
 
   const settings = { ...defaultSettings, ...options }
-  const { path, includeDev } = settings
+  const { path, includeDev, includeTransitive } = settings
 
   const licenses = []
 
   for (const subPath of path) {
-    const packageInfo = parsePackageInfo(subPath)
-    const dependencies = getDependencies(packageInfo, {
-      includeDev
+    const crawler = new DependencyCrawler({
+      path: subPath,
+      includeDev,
+      includeTransitive
     })
+
+    const packageInfo = parsePackageInfo(subPath)
+    const dependencies = crawler.listDependencies(packageInfo.name)
+
     licenses.push(...getDependenciesLicenseInfo(subPath, dependencies))
   }
 

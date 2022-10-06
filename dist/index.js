@@ -9260,9 +9260,7 @@ const external_node_fs_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import
 const external_node_path_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.url)("node:path");
 // EXTERNAL MODULE: ./node_modules/semver/index.js
 var semver = __nccwpck_require__(1383);
-;// CONCATENATED MODULE: ./src/licenses.js
-
-
+;// CONCATENATED MODULE: ./src/util.js
 
 
 
@@ -9273,19 +9271,66 @@ function parsePackageInfo(packagePath) {
   return packagecontents
 }
 
-function getDependencies(packageInfo, options) {
-  const dependencies = []
+;// CONCATENATED MODULE: ./src/dependency-crawler.js
 
-  if (packageInfo.dependencies) {
-    dependencies.push(...Object.keys(packageInfo.dependencies))
+
+
+
+class DependencyCrawler {
+  constructor(options) {
+    this.options = options
+    this.seen = new Set()
   }
 
-  if (options.includeDev && packageInfo.devDependencies) {
-    dependencies.push(...Object.keys(packageInfo.devDependencies))
+  listDependencies(packageName, root = true) {
+    if (this.seen.has(packageName)) {
+      return []
+    }
+
+    this.seen.add(packageName)
+
+    const packagePath = root
+      ? this.options.path
+      : external_node_path_namespaceObject.join(this.options.path, 'node_modules', packageName)
+
+    const packageInfo = parsePackageInfo(packagePath)
+    const dependencies = this.listDirectDependencies(packageInfo)
+
+    if (!this.options.includeTransitive) {
+      return dependencies
+    }
+
+    return [
+      ...dependencies,
+      ...dependencies.flatMap(dependency =>
+        this.listDependencies(dependency, false)
+      )
+    ]
   }
 
-  return dependencies
+  listDirectDependencies(packageInfo) {
+    const dependencies = []
+
+    if (packageInfo.dependencies) {
+      dependencies.push(...Object.keys(packageInfo.dependencies))
+    }
+
+    if (this.options?.includeDev && packageInfo.devDependencies) {
+      dependencies.push(...Object.keys(packageInfo.devDependencies))
+    }
+
+    return dependencies
+  }
 }
+
+;// CONCATENATED MODULE: ./src/licenses.js
+
+
+
+
+
+
+
 
 function getPackageAuthor(packageInfo) {
   if (typeof packageInfo.author === 'string') {
@@ -9340,19 +9385,25 @@ function buildUniqueLicenses(licenses) {
 function getLicenses(options) {
   const defaultSettings = {
     path: ['./'],
-    includeDev: false
+    includeDev: false,
+    includeTransitive: true
   }
 
   const settings = { ...defaultSettings, ...options }
-  const { path, includeDev } = settings
+  const { path, includeDev, includeTransitive } = settings
 
   const licenses = []
 
   for (const subPath of path) {
-    const packageInfo = parsePackageInfo(subPath)
-    const dependencies = getDependencies(packageInfo, {
-      includeDev
+    const crawler = new DependencyCrawler({
+      path: subPath,
+      includeDev,
+      includeTransitive
     })
+
+    const packageInfo = parsePackageInfo(subPath)
+    const dependencies = crawler.listDependencies(packageInfo.name)
+
     licenses.push(...getDependenciesLicenseInfo(subPath, dependencies))
   }
 
@@ -9368,11 +9419,13 @@ function getLicenses(options) {
 async function run() {
   const path = core.getMultilineInput('path')
   const includeDev = core.getBooleanInput('include-dev')
+  const includeTransitive = core.getBooleanInput('include-transitive')
   const licensesFile = core.getInput('licenses-file')
 
   const licenses = await getLicenses({
     path,
-    includeDev
+    includeDev,
+    includeTransitive
   })
 
   if (licensesFile) {

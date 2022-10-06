@@ -27,9 +27,34 @@ const testDirectory = t.testdir({
         'package.json': JSON.stringify({
           name: 'proddep',
           version: '18.2.0',
-          license: 'ISC'
+          license: 'ISC',
+          dependencies: {
+            transitivedep: '1.0.0'
+          }
         }),
         LICENSE: 'License content from proddep'
+      },
+      transitivedep: {
+        'package.json': JSON.stringify({
+          name: 'transitivedep',
+          version: '1.0.0',
+          license: 'BSD-3-Clause',
+          dependencies: {
+            deepnested: '2.0.0'
+          }
+        }),
+        LICENSE: 'The license content from transitivedep'
+      },
+      deepnested: {
+        'package.json': JSON.stringify({
+          name: 'deepnested',
+          version: '2.0.0',
+          license: 'BSD-3-Clause',
+          dependencies: {
+            proddep: '18.2.0'
+          }
+        }),
+        LICENSE: 'The license content from deepnested'
       }
     }
   },
@@ -74,6 +99,20 @@ t.test('getLicenses', async t => {
         version: '18.2.0',
         license: 'ISC',
         licenseText: 'License content from proddep'
+      },
+      transitivedep: {
+        author: undefined,
+        name: 'transitivedep',
+        version: '1.0.0',
+        license: 'BSD-3-Clause',
+        licenseText: 'The license content from transitivedep'
+      },
+      deepnested: {
+        author: undefined,
+        name: 'deepnested',
+        version: '2.0.0',
+        license: 'BSD-3-Clause',
+        licenseText: 'The license content from deepnested'
       }
     })
   })
@@ -93,6 +132,20 @@ t.test('getLicenses', async t => {
           version: '18.2.0',
           license: 'ISC',
           licenseText: 'License content from proddep'
+        },
+        transitivedep: {
+          author: undefined,
+          name: 'transitivedep',
+          version: '1.0.0',
+          license: 'BSD-3-Clause',
+          licenseText: 'The license content from transitivedep'
+        },
+        deepnested: {
+          author: undefined,
+          name: 'deepnested',
+          version: '2.0.0',
+          license: 'BSD-3-Clause',
+          licenseText: 'The license content from deepnested'
         },
         devdep: {
           author: 'Dev Author',
@@ -121,6 +174,20 @@ t.test('getLicenses', async t => {
         license: 'ISC',
         licenseText: 'License content from proddep'
       },
+      transitivedep: {
+        author: undefined,
+        name: 'transitivedep',
+        version: '1.0.0',
+        license: 'BSD-3-Clause',
+        licenseText: 'The license content from transitivedep'
+      },
+      deepnested: {
+        author: undefined,
+        name: 'deepnested',
+        version: '2.0.0',
+        license: 'BSD-3-Clause',
+        licenseText: 'The license content from deepnested'
+      },
       anotherdep: {
         author: undefined,
         name: 'anotherdep',
@@ -130,4 +197,24 @@ t.test('getLicenses', async t => {
       }
     })
   })
+
+  t.test(
+    'ignore transitive dependencies if the options is set to false',
+    async t => {
+      const licenses = getLicenses({
+        path: [path.join(testDirectory, 'first-package')],
+        includeTransitive: false
+      })
+
+      t.same(licenses, {
+        proddep: {
+          author: undefined,
+          name: 'proddep',
+          version: '18.2.0',
+          license: 'ISC',
+          licenseText: 'License content from proddep'
+        }
+      })
+    }
+  )
 })

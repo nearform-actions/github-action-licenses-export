@@ -6,11 +6,13 @@ import getLicenses from './licenses.js'
 export async function run() {
   const path = core.getMultilineInput('path')
   const includeDev = core.getBooleanInput('include-dev')
+  const includeTransitive = core.getBooleanInput('include-transitive')
   const licensesFile = core.getInput('licenses-file')
 
   const licenses = await getLicenses({
     path,
-    includeDev
+    includeDev,
+    includeTransitive
   })
 
   if (licensesFile) {
