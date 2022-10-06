@@ -4,6 +4,8 @@
 
 GitHub action that generates a list with the dependencies used in a **Node.js application** with their respective licenses. The result can be exported to a file or passed in as an argument to another GitHub action so it can be used to properly redistribute the licenses by displaying them in your application.
 
+If you're interested in knowing more about OSS licensing and why it is important to provide copies of the licenses in your project, please see the [opensource.com blog post](https://opensource.com/article/17/9/open-source-licensing).
+
 ## Inputs
 
 | Name                 | Required | Default   | Description                                                                                                                                            |
