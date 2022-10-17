@@ -9403,7 +9403,10 @@ function getLicenses(options) {
 
     const packageInfo = parsePackageInfo(subPath)
 
+    console.log('Parsing pacakge', packageInfo.name)
     if (!excludePackages.includes(packageInfo.name)) {
+      console.log('pacakge NOT excluded', packageInfo.name)
+
       const dependencies = crawler.listDependencies(packageInfo.name)
       licenses.push(...getDependenciesLicenseInfo(subPath, dependencies))
     } else {
