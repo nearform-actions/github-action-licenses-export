@@ -217,4 +217,24 @@ t.test('getLicenses', async t => {
       })
     }
   )
+
+  t.skip('Ignore packages in exclude-packages list', async t => {
+    const licenses = getLicenses({
+      path: [
+        path.join(testDirectory, 'first-package'),
+        path.join(testDirectory, 'second-package')
+      ],
+      excludePackages: ['second-package']
+    })
+
+    t.strictSame(licenses, {
+      proddep: {
+        author: undefined,
+        name: 'proddep',
+        version: '18.2.0',
+        license: 'ISC',
+        licenseText: 'License content from proddep'
+      }
+    })
+  })
 })

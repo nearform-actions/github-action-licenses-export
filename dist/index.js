@@ -9341,10 +9341,12 @@ function getPackageAuthor(packageInfo) {
 }
 
 function getLicenseText(packagePath) {
+  console.log(`🚀 --- packagePath`, packagePath)
   const files = glob.sync(external_node_path_namespaceObject.join(packagePath, 'licen[sc]e*'), {
     nocase: true,
     nodir: true
   })
+  console.log(`🚀 --- files`, files)
 
   if (files.length) {
     return external_node_fs_namespaceObject.readFileSync(files[0], {
@@ -9363,10 +9365,11 @@ function getDependenciesLicenseInfo(
   const filteredDependencies = dependencies.filter(
     d => !excludePackages.includes(d)
   )
-  console.log(`🚀 --- filteredDependencies`, filteredDependencies)
   return filteredDependencies.map(dependency => {
     const dependencyPath = external_node_path_namespaceObject.join(packagePath, 'node_modules', dependency)
     const packageInfo = parsePackageInfo(dependencyPath)
+
+    console.log('dependencyPath', dependencyPath)
 
     return {
       author: getPackageAuthor(packageInfo),
@@ -9432,7 +9435,6 @@ async function run() {
   const includeTransitive = core.getBooleanInput('include-transitive')
   const licensesFile = core.getInput('licenses-file')
   const excludePackages = parseCSV(core.getInput('exclude-packages'))
-  console.log(`🚀 --- excludePackages`, excludePackages)
 
   const licenses = await getLicenses({
     path,
