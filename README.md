@@ -58,7 +58,7 @@ jobs:
         uses: nearform/github-action-licenses-export@v1
         with:
           licenses-file: src/licenses.json
-          exclude-packages: ['lodash']
+          exclude-packages: 'lodash'
       - name: Commit changes
         uses: EndBug/add-and-commit@v9
         with:
