@@ -9425,7 +9425,7 @@ async function run() {
   const includeDev = core.getBooleanInput('include-dev')
   const includeTransitive = core.getBooleanInput('include-transitive')
   const licensesFile = core.getInput('licenses-file')
-  const excludePackages = core.getInput('exclude-packages')
+  const excludePackages = parseCSV(core.getInput('exclude-packages'))
 
   const licenses = await getLicenses({
     path,
@@ -9439,6 +9439,11 @@ async function run() {
   }
 
   core.setOutput('licenses', licenses)
+}
+
+function parseCSV(value) {
+  if (!value || value.trim() === '') return []
+  return value.split(',').map(p => p.trim())
 }
 
 ;// CONCATENATED MODULE: ./src/index.js
