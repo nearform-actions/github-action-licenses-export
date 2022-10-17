@@ -30,7 +30,7 @@ This action reads the `package.json` from the provided path to determine the dep
 
 ### Generating a license file and commiting the changes
 
-This example runs on every push to the `master` branch and generates a license file located in `src/licenses.json` that gets commited and pushed if there are changes.
+This example runs on every push to the `master` branch and generates a license file located in `src/licenses.json` that gets commited and pushed if there are changes. Packages to be excluded are specified using the `exclude-packages` input.
 
 ```yaml
 name: Update licenses file
