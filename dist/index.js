@@ -9406,6 +9406,8 @@ function getLicenses(options) {
     if (!excludePackages.includes(packageInfo.name)) {
       const dependencies = crawler.listDependencies(packageInfo.name)
       licenses.push(...getDependenciesLicenseInfo(subPath, dependencies))
+    } else {
+      console.log('Excluding pacakge', packageInfo.name)
     }
   }
 

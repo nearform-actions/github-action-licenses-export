@@ -14,7 +14,7 @@ If you're interested in knowing more about OSS licensing and why it is important
 | `licenses-file`      | No       |           | Licenses output JSON file                                                                                                                              |
 | `include-dev`        | No       | `'false'` | Include development packages                                                                                                                           |
 | `include-transitive` | No       | `'true'`  | Include transitive packages                                                                                                                            |
-| `exclude-packages`   | No       | `[]`      | Exclude packages                                                                                                                            |
+| `exclude-packages`   | No       | `''`      | Exclude packages                                                                                                                            |
 
 ## Outputs
 
