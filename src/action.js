@@ -9,7 +9,6 @@ export async function run() {
   const includeTransitive = core.getBooleanInput('include-transitive')
   const licensesFile = core.getInput('licenses-file')
   const excludePackages = parseCSV(core.getInput('exclude-packages'))
-  console.log(`🚀 --- excludePackages`, excludePackages)
 
   const licenses = await getLicenses({
     path,
