@@ -9355,8 +9355,16 @@ function getLicenseText(packagePath) {
   return undefined
 }
 
-function getDependenciesLicenseInfo(packagePath, dependencies) {
-  return dependencies.map(dependency => {
+function getDependenciesLicenseInfo(
+  packagePath,
+  dependencies,
+  excludePackages
+) {
+  const filteredDependencies = dependencies.filter(
+    d => !excludePackages.includes(d)
+  )
+  console.log(`🚀 --- filteredDependencies`, filteredDependencies)
+  return filteredDependencies.map(dependency => {
     const dependencyPath = external_node_path_namespaceObject.join(packagePath, 'node_modules', dependency)
     const packageInfo = parsePackageInfo(dependencyPath)
 
@@ -9403,15 +9411,10 @@ function getLicenses(options) {
 
     const packageInfo = parsePackageInfo(subPath)
 
-    console.log('Parsing pacakge', packageInfo.name)
-    if (!excludePackages.includes(packageInfo.name)) {
-      console.log('pacakge NOT excluded', packageInfo.name)
-
-      const dependencies = crawler.listDependencies(packageInfo.name)
-      licenses.push(...getDependenciesLicenseInfo(subPath, dependencies))
-    } else {
-      console.log('Excluding pacakge', packageInfo.name)
-    }
+    const dependencies = crawler.listDependencies(packageInfo.name)
+    licenses.push(
+      ...getDependenciesLicenseInfo(subPath, dependencies, excludePackages)
+    )
   }
 
   return buildUniqueLicenses(licenses)
@@ -9429,6 +9432,7 @@ async function run() {
   const includeTransitive = core.getBooleanInput('include-transitive')
   const licensesFile = core.getInput('licenses-file')
   const excludePackages = parseCSV(core.getInput('exclude-packages'))
+  console.log(`🚀 --- excludePackages`, excludePackages)
 
   const licenses = await getLicenses({
     path,

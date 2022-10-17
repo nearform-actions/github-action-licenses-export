@@ -29,8 +29,16 @@ function getLicenseText(packagePath) {
   return undefined
 }
 
-function getDependenciesLicenseInfo(packagePath, dependencies) {
-  return dependencies.map(dependency => {
+function getDependenciesLicenseInfo(
+  packagePath,
+  dependencies,
+  excludePackages
+) {
+  const filteredDependencies = dependencies.filter(
+    d => !excludePackages.includes(d)
+  )
+  console.log(`🚀 --- filteredDependencies`, filteredDependencies)
+  return filteredDependencies.map(dependency => {
     const dependencyPath = path.join(packagePath, 'node_modules', dependency)
     const packageInfo = parsePackageInfo(dependencyPath)
 
@@ -77,15 +85,10 @@ export default function getLicenses(options) {
 
     const packageInfo = parsePackageInfo(subPath)
 
-    console.log('Parsing pacakge', packageInfo.name)
-    if (!excludePackages.includes(packageInfo.name)) {
-      console.log('pacakge NOT excluded', packageInfo.name)
-
-      const dependencies = crawler.listDependencies(packageInfo.name)
-      licenses.push(...getDependenciesLicenseInfo(subPath, dependencies))
-    } else {
-      console.log('Excluding pacakge', packageInfo.name)
-    }
+    const dependencies = crawler.listDependencies(packageInfo.name)
+    licenses.push(
+      ...getDependenciesLicenseInfo(subPath, dependencies, excludePackages)
+    )
   }
 
   return buildUniqueLicenses(licenses)
