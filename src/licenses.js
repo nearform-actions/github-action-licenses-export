@@ -37,7 +37,6 @@ function getDependenciesLicenseInfo(
   const filteredDependencies = dependencies.filter(
     d => !excludePackages.includes(d)
   )
-  console.log(`🚀 --- filteredDependencies`, filteredDependencies)
   return filteredDependencies.map(dependency => {
     const dependencyPath = path.join(packagePath, 'node_modules', dependency)
     const packageInfo = parsePackageInfo(dependencyPath)
