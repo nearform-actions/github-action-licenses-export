@@ -64,7 +64,7 @@ export default function getLicenses(options) {
   }
 
   const settings = { ...defaultSettings, ...options }
-  const { path, includeDev, includeTransitive } = settings
+  const { path, includeDev, includeTransitive, excludePackages = [] } = settings
 
   const licenses = []
 
@@ -76,9 +76,11 @@ export default function getLicenses(options) {
     })
 
     const packageInfo = parsePackageInfo(subPath)
-    const dependencies = crawler.listDependencies(packageInfo.name)
 
-    licenses.push(...getDependenciesLicenseInfo(subPath, dependencies))
+    if (!excludePackages.includes(packageInfo.name)) {
+      const dependencies = crawler.listDependencies(packageInfo.name)
+      licenses.push(...getDependenciesLicenseInfo(subPath, dependencies))
+    }
   }
 
   return buildUniqueLicenses(licenses)

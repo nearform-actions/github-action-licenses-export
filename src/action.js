@@ -8,11 +8,13 @@ export async function run() {
   const includeDev = core.getBooleanInput('include-dev')
   const includeTransitive = core.getBooleanInput('include-transitive')
   const licensesFile = core.getInput('licenses-file')
+  const excludePackages = core.getInput('exclude-packages')
 
   const licenses = await getLicenses({
     path,
     includeDev,
-    includeTransitive
+    includeTransitive,
+    excludePackages
   })
 
   if (licensesFile) {

@@ -9390,7 +9390,7 @@ function getLicenses(options) {
   }
 
   const settings = { ...defaultSettings, ...options }
-  const { path, includeDev, includeTransitive } = settings
+  const { path, includeDev, includeTransitive, excludePackages = [] } = settings
 
   const licenses = []
 
@@ -9402,9 +9402,11 @@ function getLicenses(options) {
     })
 
     const packageInfo = parsePackageInfo(subPath)
-    const dependencies = crawler.listDependencies(packageInfo.name)
 
-    licenses.push(...getDependenciesLicenseInfo(subPath, dependencies))
+    if (!excludePackages.includes(packageInfo.name)) {
+      const dependencies = crawler.listDependencies(packageInfo.name)
+      licenses.push(...getDependenciesLicenseInfo(subPath, dependencies))
+    }
   }
 
   return buildUniqueLicenses(licenses)
@@ -9421,11 +9423,13 @@ async function run() {
   const includeDev = core.getBooleanInput('include-dev')
   const includeTransitive = core.getBooleanInput('include-transitive')
   const licensesFile = core.getInput('licenses-file')
+  const excludePackages = core.getInput('exclude-packages')
 
   const licenses = await getLicenses({
     path,
     includeDev,
-    includeTransitive
+    includeTransitive,
+    excludePackages
   })
 
   if (licensesFile) {
