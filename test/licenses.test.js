@@ -234,6 +234,27 @@ t.test('getLicenses', async t => {
         version: '18.2.0',
         license: 'ISC',
         licenseText: 'License content from proddep'
+      },
+      transitivedep: {
+        author: undefined,
+        name: 'transitivedep',
+        version: '1.0.0',
+        license: 'BSD-3-Clause',
+        licenseText: 'The license content from transitivedep'
+      },
+      deepnested: {
+        author: undefined,
+        name: 'deepnested',
+        version: '2.0.0',
+        license: 'BSD-3-Clause',
+        licenseText: 'The license content from deepnested'
+      },
+      anotherdep: {
+        author: undefined,
+        name: 'anotherdep',
+        version: '1.0.1',
+        license: 'ISC',
+        licenseText: 'License content from anotherdep'
       }
     })
   })
