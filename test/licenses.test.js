@@ -218,7 +218,7 @@ t.test('getLicenses', async t => {
     }
   )
 
-  t.skip('Ignore packages in exclude-packages list', async t => {
+  t.test('Ignore packages in exclude-packages list', async t => {
     const licenses = getLicenses({
       path: [
         path.join(testDirectory, 'first-package'),
