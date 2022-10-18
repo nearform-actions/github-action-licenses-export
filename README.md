@@ -14,6 +14,7 @@ If you're interested in knowing more about OSS licensing and why it is important
 | `licenses-file`      | No       |           | Licenses output JSON file                                                                                                                              |
 | `include-dev`        | No       | `'false'` | Include development packages                                                                                                                           |
 | `include-transitive` | No       | `'true'`  | Include transitive packages                                                                                                                            |
+| `exclude-packages`   | No       | `''`      | Exclude packages                                                                                                                            |
 
 ## Outputs
 
@@ -29,7 +30,7 @@ This action reads the `package.json` from the provided path to determine the dep
 
 ### Generating a license file and commiting the changes
 
-This example runs on every push to the `master` branch and generates a license file located in `src/licenses.json` that gets commited and pushed if there are changes.
+This example runs on every push to the `master` branch and generates a license file located in `src/licenses.json` that gets commited and pushed if there are changes. Packages to be excluded are specified using the `exclude-packages` input.
 
 ```yaml
 name: Update licenses file
@@ -57,6 +58,7 @@ jobs:
         uses: nearform/github-action-licenses-export@v1
         with:
           licenses-file: src/licenses.json
+          exclude-packages: 'lodash'
       - name: Commit changes
         uses: EndBug/add-and-commit@v9
         with:

@@ -20,6 +20,10 @@ inputs:
     description: 'Include transitive packages'
     required: false
     default: 'true'
+  exclude-packages:
+    description: 'A comma-separated list of packages to ignore'
+    required: false
+    default: ''
 
 outputs:
   licenses:

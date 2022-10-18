@@ -29,8 +29,15 @@ function getLicenseText(packagePath) {
   return undefined
 }
 
-function getDependenciesLicenseInfo(packagePath, dependencies) {
-  return dependencies.map(dependency => {
+function getDependenciesLicenseInfo(
+  packagePath,
+  dependencies,
+  excludePackages
+) {
+  const filteredDependencies = dependencies.filter(
+    d => !excludePackages.includes(d)
+  )
+  return filteredDependencies.map(dependency => {
     const dependencyPath = path.join(packagePath, 'node_modules', dependency)
     const packageInfo = parsePackageInfo(dependencyPath)
 
@@ -64,7 +71,7 @@ export default function getLicenses(options) {
   }
 
   const settings = { ...defaultSettings, ...options }
-  const { path, includeDev, includeTransitive } = settings
+  const { path, includeDev, includeTransitive, excludePackages = [] } = settings
 
   const licenses = []
 
@@ -76,9 +83,11 @@ export default function getLicenses(options) {
     })
 
     const packageInfo = parsePackageInfo(subPath)
-    const dependencies = crawler.listDependencies(packageInfo.name)
 
-    licenses.push(...getDependenciesLicenseInfo(subPath, dependencies))
+    const dependencies = crawler.listDependencies(packageInfo.name)
+    licenses.push(
+      ...getDependenciesLicenseInfo(subPath, dependencies, excludePackages)
+    )
   }
 
   return buildUniqueLicenses(licenses)
