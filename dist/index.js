@@ -1752,6 +1752,57 @@ exports.checkBypass = checkBypass;
 
 /***/ }),
 
+/***/ 2020:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+
+
+const core = __nccwpck_require__(2186)
+
+/**
+ * Displays warning message if the action reference is pinned to master/main
+ */
+function logActionRefWarning() {
+  const actionRef = process.env.GITHUB_ACTION_REF
+  const repoName = process.env.GITHUB_ACTION_REPOSITORY
+
+  if (actionRef === 'main' || actionRef === 'master') {
+    core.warning(
+      `${repoName} is pinned at HEAD. We strongly ` +
+        `advise against pinning to "@${actionRef}" as it may be unstable. Please ` +
+        `update your GitHub Action YAML from:\n\n` +
+        `    uses: '${repoName}@${actionRef}'\n\n` +
+        `to:\n\n` +
+        `    uses: '${repoName}@<release/tag version>'\n\n` +
+        `Alternatively, you can pin to any git tag or git SHA in the ` +
+        `repository.`
+    )
+  }
+}
+
+/**
+ * Displays warning message if the repository is under the nearform organisation
+ */
+function logRepoWarning() {
+  const repoName = process.env.GITHUB_ACTION_REPOSITORY
+  const repoOrg = repoName.split('/')[0]
+
+  if (repoOrg != 'nearform-actions') {
+    core.warning(
+      `'${repoOrg}' is no longer a valid organisation for this action.` +
+        `Please update it to be under the 'nearform-actions' organisation.`
+    )
+  }
+}
+
+module.exports = {
+  logActionRefWarning,
+  logRepoWarning
+}
+
+
+/***/ }),
+
 /***/ 9417:
 /***/ ((module) => {
 
@@ -9256,6 +9307,8 @@ var __webpack_exports__ = {};
 var core = __nccwpck_require__(2186);
 // EXTERNAL MODULE: external "fs"
 var external_fs_ = __nccwpck_require__(7147);
+// EXTERNAL MODULE: ./node_modules/actions-toolkit/src/index.js
+var src = __nccwpck_require__(2020);
 // EXTERNAL MODULE: ./node_modules/glob/glob.js
 var glob = __nccwpck_require__(1957);
 ;// CONCATENATED MODULE: external "node:fs"
@@ -9429,7 +9482,11 @@ function getLicenses(options) {
 
 
 
+
 async function run() {
+  src.logActionRefWarning()
+  src.logRepoWarning()
+
   const path = core.getMultilineInput('path')
   const includeDev = core.getBooleanInput('include-dev')
   const includeTransitive = core.getBooleanInput('include-transitive')

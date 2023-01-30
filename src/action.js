@@ -1,9 +1,13 @@
 import * as core from '@actions/core'
 import fs from 'fs'
+import * as toolkit from 'actions-toolkit'
 
 import getLicenses from './licenses.js'
 
 export async function run() {
+  toolkit.logActionRefWarning()
+  toolkit.logRepoWarning()
+
   const path = core.getMultilineInput('path')
   const includeDev = core.getBooleanInput('include-dev')
   const includeTransitive = core.getBooleanInput('include-transitive')
