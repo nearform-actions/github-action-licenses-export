@@ -1,4 +1,4 @@
-import glob from 'glob'
+import { globSync } from 'glob'
 import fs from 'node:fs'
 import path from 'node:path'
 import semver from 'semver'
@@ -15,7 +15,7 @@ function getPackageAuthor(packageInfo) {
 }
 
 function getLicenseText(packagePath) {
-  const files = glob.sync(path.join(packagePath, 'licen[sc]e*'), {
+  const files = globSync(path.join(packagePath, 'licen[sc]e*'), {
     nocase: true,
     nodir: true
   })
