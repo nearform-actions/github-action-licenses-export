@@ -44,6 +44,8 @@ jobs:
   update-licenses:
     name: Generates a licenses file for the dependencies used in the application and commits the changes
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -82,6 +84,8 @@ jobs:
   update-licenses:
     name: Generates a licenses list for the dependencies used in the application and commits the changes
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
