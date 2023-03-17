@@ -13499,12 +13499,23 @@ function globSync(pattern, options = {}) {
 async function glob(pattern, options = {}) {
     return new Glob(pattern, options).walk();
 }
-function globIterate(pattern, options = {}) {
-    return new Glob(pattern, options).iterate();
-}
 function globIterateSync(pattern, options = {}) {
     return new Glob(pattern, options).iterateSync();
 }
+function globIterate(pattern, options = {}) {
+    return new Glob(pattern, options).iterate();
+}
+// aliases: glob.sync.stream() glob.stream.sync() glob.sync() etc
+const streamSync = globStreamSync;
+const stream = Object.assign(globStream, { sync: globStreamSync });
+const iterateSync = globIterateSync;
+const iterate = Object.assign(globIterate, {
+    sync: globIterateSync,
+});
+const sync = Object.assign(globSync, {
+    stream: globStreamSync,
+    iterate: globIterateSync,
+});
 /* c8 ignore start */
 
 
@@ -13513,10 +13524,15 @@ function globIterateSync(pattern, options = {}) {
 /* harmony default export */ const dist_mjs = (Object.assign(glob, {
     glob,
     globSync,
+    sync,
     globStream,
+    stream,
     globStreamSync,
+    streamSync,
     globIterate,
+    iterate,
     globIterateSync,
+    iterateSync,
     Glob: Glob,
     hasMagic: hasMagic,
     escape: escape_escape,
