@@ -1,4 +1,4 @@
-![CI](https://github.com/nearform/github-action-licenses-export/actions/workflows/ci.yml/badge.svg?event=push)
+![CI](https://github.com/nearform-actions/github-action-licenses-export/actions/workflows/ci.yml/badge.svg?event=push)
 
 # github-action-licenses-export
 
@@ -57,7 +57,7 @@ jobs:
         run: |
           npm ci
       - name: Generate licenses file
-        uses: nearform/github-action-licenses-export@v1
+        uses: nearform-actions/github-action-licenses-export@v1
         with:
           licenses-file: src/licenses.json
           exclude-packages: 'lodash'
@@ -98,7 +98,7 @@ jobs:
           npm ci
       - name: Generate licenses
         id: generate_licenses
-        uses: nearform/github-action-licenses-export@v1
+        uses: nearform-actions/github-action-licenses-export@v1
       - name: Do something with the licenses
         run: |
           echo ${{ steps.generate_licenses.outputs.licenses }}
