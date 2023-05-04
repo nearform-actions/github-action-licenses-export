@@ -1,6 +1,5 @@
 name: release
-
-on:
+'on':
   workflow_dispatch:
     inputs:
       semver:
@@ -13,14 +12,15 @@ on:
           - minor
           - major
   pull_request:
-    types: [closed]
-
+    types:
+      - closed
 jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
+      contents: write
+      issues: write
       pull-requests: write
-      contents: write    
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -29,6 +29,6 @@ jobs:
       - uses: nearform-actions/optic-release-automation-action@v4
         with:
           semver: ${{ github.event.inputs.semver }}
-          sync-semver-tags: true          
+          sync-semver-tags: true
           commit-message: 'chore: release {version}'
           build-command: npm ci
