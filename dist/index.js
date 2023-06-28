@@ -2699,15 +2699,18 @@ class Range {
     const hr = loose ? re[t.HYPHENRANGELOOSE] : re[t.HYPHENRANGE]
     range = range.replace(hr, hyphenReplace(this.options.includePrerelease))
     debug('hyphen replace', range)
+
     // `> 1.2.3 < 1.2.5` => `>1.2.3 <1.2.5`
     range = range.replace(re[t.COMPARATORTRIM], comparatorTrimReplace)
     debug('comparator trim', range)
 
     // `~ 1.2.3` => `~1.2.3`
     range = range.replace(re[t.TILDETRIM], tildeTrimReplace)
+    debug('tilde trim', range)
 
     // `^ 1.2.3` => `^1.2.3`
     range = range.replace(re[t.CARETTRIM], caretTrimReplace)
+    debug('caret trim', range)
 
     // At this point, the range is completely trimmed and
     // ready to be split into comparators.
@@ -4009,6 +4012,10 @@ const MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER ||
 // Max safe segment length for coercion.
 const MAX_SAFE_COMPONENT_LENGTH = 16
 
+// Max safe length for a build identifier. The max length minus 6 characters for
+// the shortest version with a build 0.0.0+BUILD.
+const MAX_SAFE_BUILD_LENGTH = MAX_LENGTH - 6
+
 const RELEASE_TYPES = [
   'major',
   'premajor',
@@ -4022,6 +4029,7 @@ const RELEASE_TYPES = [
 module.exports = {
   MAX_LENGTH,
   MAX_SAFE_COMPONENT_LENGTH,
+  MAX_SAFE_BUILD_LENGTH,
   MAX_SAFE_INTEGER,
   RELEASE_TYPES,
   SEMVER_SPEC_VERSION,
@@ -4103,7 +4111,7 @@ module.exports = parseOptions
 /***/ 9523:
 /***/ ((module, exports, __nccwpck_require__) => {
 
-const { MAX_SAFE_COMPONENT_LENGTH } = __nccwpck_require__(2293)
+const { MAX_SAFE_COMPONENT_LENGTH, MAX_SAFE_BUILD_LENGTH } = __nccwpck_require__(2293)
 const debug = __nccwpck_require__(427)
 exports = module.exports = {}
 
@@ -4114,16 +4122,31 @@ const src = exports.src = []
 const t = exports.t = {}
 let R = 0
 
+const LETTERDASHNUMBER = '[a-zA-Z0-9-]'
+
+// Replace some greedy regex tokens to prevent regex dos issues. These regex are
+// used internally via the safeRe object since all inputs in this library get
+// normalized first to trim and collapse all extra whitespace. The original
+// regexes are exported for userland consumption and lower level usage. A
+// future breaking change could export the safer regex only with a note that
+// all input should have extra whitespace removed.
+const safeRegexReplacements = [
+  ['\\s', 1],
+  ['\\d', MAX_SAFE_COMPONENT_LENGTH],
+  [LETTERDASHNUMBER, MAX_SAFE_BUILD_LENGTH],
+]
+
+const makeSafeRegex = (value) => {
+  for (const [token, max] of safeRegexReplacements) {
+    value = value
+      .split(`${token}*`).join(`${token}{0,${max}}`)
+      .split(`${token}+`).join(`${token}{1,${max}}`)
+  }
+  return value
+}
+
 const createToken = (name, value, isGlobal) => {
-  // Replace all greedy whitespace to prevent regex dos issues. These regex are
-  // used internally via the safeRe object since all inputs in this library get
-  // normalized first to trim and collapse all extra whitespace. The original
-  // regexes are exported for userland consumption and lower level usage. A
-  // future breaking change could export the safer regex only with a note that
-  // all input should have extra whitespace removed.
-  const safe = value
-    .split('\\s*').join('\\s{0,1}')
-    .split('\\s+').join('\\s')
+  const safe = makeSafeRegex(value)
   const index = R++
   debug(name, index, value)
   t[name] = index
@@ -4139,13 +4162,13 @@ const createToken = (name, value, isGlobal) => {
 // A single `0`, or a non-zero digit followed by zero or more digits.
 
 createToken('NUMERICIDENTIFIER', '0|[1-9]\\d*')
-createToken('NUMERICIDENTIFIERLOOSE', '[0-9]+')
+createToken('NUMERICIDENTIFIERLOOSE', '\\d+')
 
 // ## Non-numeric Identifier
 // Zero or more digits, followed by a letter or hyphen, and then zero or
 // more letters, digits, or hyphens.
 
-createToken('NONNUMERICIDENTIFIER', '\\d*[a-zA-Z-][a-zA-Z0-9-]*')
+createToken('NONNUMERICIDENTIFIER', `\\d*[a-zA-Z-]${LETTERDASHNUMBER}*`)
 
 // ## Main Version
 // Three dot-separated numeric identifiers.
@@ -4180,7 +4203,7 @@ createToken('PRERELEASELOOSE', `(?:-?(${src[t.PRERELEASEIDENTIFIERLOOSE]
 // ## Build Metadata Identifier
 // Any combination of digits, letters, or hyphens.
 
-createToken('BUILDIDENTIFIER', '[0-9A-Za-z-]+')
+createToken('BUILDIDENTIFIER', `${LETTERDASHNUMBER}+`)
 
 // ## Build Metadata
 // Plus sign, followed by one or more period-separated build metadata
@@ -8636,7 +8659,8 @@ class LRUCache {
                 status.ttl = ttl;
                 status.start = start;
                 status.now = cachedNow || getNow();
-                status.remainingTTL = status.now + ttl - start;
+                const age = status.now - start;
+                status.remainingTTL = ttl - age;
             }
         };
         // debounce calls to perf.now() to 1s so we're not hitting
@@ -8661,9 +8685,13 @@ class LRUCache {
             if (index === undefined) {
                 return 0;
             }
-            return ttls[index] === 0 || starts[index] === 0
-                ? Infinity
-                : starts[index] + ttls[index] - (cachedNow || getNow());
+            const ttl = ttls[index];
+            const start = starts[index];
+            if (ttl === 0 || start === 0) {
+                return Infinity;
+            }
+            const age = (cachedNow || getNow()) - start;
+            return ttl - age;
         };
         this.#isStale = index => {
             return (ttls[index] !== 0 &&
@@ -8978,8 +9006,15 @@ class LRUCache {
     }
     /**
      * Add a value to the cache.
+     *
+     * Note: if `undefined` is specified as a value, this is an alias for
+     * {@link LRUCache#delete}
      */
     set(k, v, setOptions = {}) {
+        if (v === undefined) {
+            this.delete(k);
+            return this;
+        }
         const { ttl = this.ttl, start, noDisposeOnSet = this.noDisposeOnSet, sizeCalculation = this.sizeCalculation, status, } = setOptions;
         let { noUpdateTTL = this.noUpdateTTL } = setOptions;
         const size = this.#requireSize(k, v, setOptions.size || 0, sizeCalculation);
@@ -9276,7 +9311,7 @@ class LRUCache {
         const pcall = (res, rej) => {
             const fmp = this.#fetchMethod?.(k, v, fetchOpts);
             if (fmp && fmp instanceof Promise) {
-                fmp.then(v => res(v), rej);
+                fmp.then(v => res(v === undefined ? undefined : v), rej);
             }
             // ignored, we go until we finish, regardless.
             // defer check until we are actually aborting,
@@ -9284,7 +9319,7 @@ class LRUCache {
             ac.signal.addEventListener('abort', () => {
                 if (!options.ignoreFetchAbort ||
                     options.allowStaleOnFetchAbort) {
-                    res();
+                    res(undefined);
                     // when it eventually resolves, update the cache.
                     if (options.allowStaleOnFetchAbort) {
                         res = v => cb(v, true);
@@ -10428,6 +10463,7 @@ class ChildrenCache extends LRUCache {
         });
     }
 }
+const setAsCwd = Symbol('PathScurry setAsCwd');
 /**
  * Path objects are sort of like a super-powered
  * {@link https://nodejs.org/docs/latest/api/fs.html#class-fsdirent fs.Dirent}
@@ -10560,6 +10596,16 @@ class PathBase {
     #children;
     #linkTarget;
     #realpath;
+    /**
+     * This property is for compatibility with the Dirent class as of
+     * Node v20, where Dirent['path'] refers to the path of the directory
+     * that was passed to readdir.  So, somewhat counterintuitively, this
+     * property refers to the *parent* path, not the path object itself.
+     * For root entries, it's the path to the entry itself.
+     */
+    get path() {
+        return (this.parent || this).fullpath();
+    }
     /**
      * Do not create new Path objects directly.  They should always be accessed
      * via the PathScurry class or other methods on the Path class.
@@ -10707,8 +10753,7 @@ class PathBase {
             return (this.#relative = this.name);
         }
         const pv = p.relative();
-        const rp = pv + (!pv || !p.parent ? '' : this.sep) + name;
-        return (this.#relative = rp);
+        return pv + (!pv || !p.parent ? '' : this.sep) + name;
     }
     /**
      * The relative path from the cwd, using / as the path separator.
@@ -10727,8 +10772,7 @@ class PathBase {
             return (this.#relativePosix = this.fullpathPosix());
         }
         const pv = p.relativePosix();
-        const rp = pv + (!pv || !p.parent ? '' : '/') + name;
-        return (this.#relativePosix = rp);
+        return pv + (!pv || !p.parent ? '' : '/') + name;
     }
     /**
      * The fully resolved path string for this Path entry
@@ -10780,6 +10824,29 @@ class PathBase {
      */
     isUnknown() {
         return (this.#type & IFMT) === UNKNOWN;
+    }
+    isType(type) {
+        return this[`is${type}`]();
+    }
+    getType() {
+        return this.isUnknown()
+            ? 'Unknown'
+            : this.isDirectory()
+                ? 'Directory'
+                : this.isFile()
+                    ? 'File'
+                    : this.isSymbolicLink()
+                        ? 'SymbolicLink'
+                        : this.isFIFO()
+                            ? 'FIFO'
+                            : this.isCharacterDevice()
+                                ? 'CharacterDevice'
+                                : this.isBlockDevice()
+                                    ? 'BlockDevice'
+                                    : /* c8 ignore start */ this.isSocket()
+                                        ? 'Socket'
+                                        : 'Unknown';
+        /* c8 ignore stop */
     }
     /**
      * Is the Path a regular file?
@@ -11378,6 +11445,33 @@ class PathBase {
         }
         catch (_) {
             this.#markENOREALPATH();
+        }
+    }
+    /**
+     * Internal method to mark this Path object as the scurry cwd,
+     * called by {@link PathScurry#chdir}
+     *
+     * @internal
+     */
+    [setAsCwd](oldCwd) {
+        if (oldCwd === this)
+            return;
+        const changed = new Set([]);
+        let rp = [];
+        let p = this;
+        while (p && p.parent) {
+            changed.add(p);
+            p.#relative = rp.join(this.sep);
+            p.#relativePosix = rp.join('/');
+            p = p.parent;
+            rp.push('..');
+        }
+        // now un-memoize parents of old cwd
+        p = oldCwd;
+        while (p && p.parent && !changed.has(p)) {
+            p.#relative = undefined;
+            p.#relativePosix = undefined;
+            p = p.parent;
         }
     }
 }
@@ -12103,6 +12197,11 @@ class PathScurryBase {
         };
         process();
         return results;
+    }
+    chdir(path = this.cwd) {
+        const oldCwd = this.cwd;
+        this.cwd = typeof path === 'string' ? this.cwd.resolve(path) : path;
+        this.cwd[setAsCwd](oldCwd);
     }
 }
 /**
