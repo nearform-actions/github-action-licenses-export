@@ -12632,7 +12632,7 @@ const PathScurry = process.platform === 'win32'
         ? PathScurryDarwin
         : PathScurryPosix;
 //# sourceMappingURL=index.js.map
-;// CONCATENATED MODULE: ./node_modules/glob/dist/mjs/pattern.js
+;// CONCATENATED MODULE: ./node_modules/glob/dist/esm/pattern.js
 // this is just a very light wrapper around 2 arrays with an offset index
 
 const isPatternList = (pl) => pl.length >= 1;
@@ -13558,7 +13558,7 @@ class minipass_Minipass extends external_stream_namespaceObject {
 
 
 
-;// CONCATENATED MODULE: ./node_modules/glob/dist/mjs/ignore.js
+;// CONCATENATED MODULE: ./node_modules/glob/dist/esm/ignore.js
 // give it a pattern, and it'll be able to tell you if
 // a given path should be ignored.
 // Ignoring a path ignores its children if the pattern ends in /**
@@ -13611,6 +13611,11 @@ class Ignore {
             for (let i = 0; i < mm.set.length; i++) {
                 const parsed = mm.set[i];
                 const globParts = mm.globParts[i];
+                /* c8 ignore start */
+                if (!parsed || !globParts) {
+                    throw new Error('invalid pattern object');
+                }
+                /* c8 ignore stop */
                 const p = new Pattern(parsed, globParts, 0, platform);
                 const m = new Minimatch(p.globString(), mmopts);
                 const children = globParts[globParts.length - 1] === '**';
@@ -13652,13 +13657,13 @@ class Ignore {
         }
         for (const m of this.absoluteChildren) {
             if (m.match(fullpath))
-                true;
+                return true;
         }
         return false;
     }
 }
 //# sourceMappingURL=ignore.js.map
-;// CONCATENATED MODULE: ./node_modules/glob/dist/mjs/processor.js
+;// CONCATENATED MODULE: ./node_modules/glob/dist/esm/processor.js
 // synchronous utility for filtering entries and calculating subwalks
 
 /**
@@ -13954,7 +13959,7 @@ class Processor {
     }
 }
 //# sourceMappingURL=processor.js.map
-;// CONCATENATED MODULE: ./node_modules/glob/dist/mjs/walker.js
+;// CONCATENATED MODULE: ./node_modules/glob/dist/esm/walker.js
 /**
  * Single-use utility classes to provide functionality to the {@link Glob}
  * methods.
@@ -14307,7 +14312,7 @@ class GlobStream extends GlobUtil {
     }
 }
 //# sourceMappingURL=walker.js.map
-;// CONCATENATED MODULE: ./node_modules/glob/dist/mjs/glob.js
+;// CONCATENATED MODULE: ./node_modules/glob/dist/esm/glob.js
 
 
 
@@ -14469,7 +14474,12 @@ class Glob {
             return set;
         }, [[], []]);
         this.patterns = matchSet.map((set, i) => {
-            return new Pattern(set, globParts[i], 0, this.platform);
+            const g = globParts[i];
+            /* c8 ignore start */
+            if (!g)
+                throw new Error('invalid pattern object');
+            /* c8 ignore stop */
+            return new Pattern(set, g, 0, this.platform);
         });
     }
     async walk() {
@@ -14542,7 +14552,7 @@ class Glob {
     }
 }
 //# sourceMappingURL=glob.js.map
-;// CONCATENATED MODULE: ./node_modules/glob/dist/mjs/has-magic.js
+;// CONCATENATED MODULE: ./node_modules/glob/dist/esm/has-magic.js
 
 /**
  * Return true if the patterns provided contain any magic glob characters,
@@ -14566,7 +14576,7 @@ const hasMagic = (pattern, options = {}) => {
     return false;
 };
 //# sourceMappingURL=has-magic.js.map
-;// CONCATENATED MODULE: ./node_modules/glob/dist/mjs/index.js
+;// CONCATENATED MODULE: ./node_modules/glob/dist/esm/index.js
 
 
 
