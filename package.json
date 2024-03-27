@@ -8,7 +8,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "tap --no-coverage",
-    "prepare": "husky install",
+    "prepare": "husky",
     "build": "ncc build src --license licenses.txt"
   },
   "repository": {
