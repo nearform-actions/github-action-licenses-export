@@ -38,7 +38,7 @@
     "*.{js,jsx}": "eslint --cache --fix"
   },
   "dependencies": {
-    "@actions/core": "^2.0.3",
+    "@actions/core": "^3.0.0",
     "actions-toolkit": "github:nearform/actions-toolkit",
     "glob": "^13.0.0",
     "semver": "^7.7.3"
